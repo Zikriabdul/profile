@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiTumbuh - Pemantauan Gizi Anak</title>
+  <style>
+    :root {
+      --primary: #0d9488;
+      --background: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --badge-color: #10b981;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-color);
+      padding: 0;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      color: white;
+      position: relative;
+    }
+
+    .navbar h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .nav-btn {
+      background-color: white;
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 2px solid white;
+    }
+
+    .nav-btn:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: absolute;
+        top: 64px;
+        right: 0;
+        background-color: var(--primary);
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 1rem;
+      }
+
+      .nav-links.active {
+        max-height: 200px;
+        padding: 1rem;
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background-color: #e0fdfa;
+    }
+
+    .hero h2 {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: auto;
+      color: #334155;
+    }
+
+    .container {
+      background: white;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+
+    label {
+      margin-top: 1rem;
+      display: block;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.3rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0f766e;
+    }
+
+    .hasil {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-radius: 10px;
+      background-color: #f1f3f5;
+    }
+
+    .status-box {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    .biru { background-color: #e6f0ff; }
+    .kuning { background-color: #fffacc; }
+    .hijau { background-color: #e8f9e9; }
+
+    .section {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .section h2::before {
+      content: '';
+      width: 6px;
+      height: 24px;
+      background: var(--primary);
+      margin-right: 0.5rem;
+      border-radius: 2px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: var(--badge-color);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      margin-top: 0.5rem;
+    }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 2rem;
+      color: #2a7a5e;
+      margin-bottom: 10px;
+    }
+
+    .emoji {
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    p {
+      line-height: 1.8;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px;
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <h1>SiTumbuh</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a class="nav-btn" href="#formGizi">Kalkulator</a>
+      <a class="nav-btn" href="#tentang">Edukasi</a>
+      <a class="nav-btn" href="#Diskusi">Diskusi</a>
+    </nav>
+  </div>
+
+  <div class="hero" id="beranda">
+    <h2>Selamat Datang di SiTumbuh</h2>
+    <p>Alat bantu orang tua memantau gizi dan tumbuh kembang anak dengan mudah dan informatif.</p>
+  </div>
+
+  <div class="container">
+    <h1 class="title">Selamat Datang di SiTumbuh <span class="emoji">👶🌱</span></h1>
+    <p>
+      Website edukasi <strong>SiTumbuh</strong> ini disusun oleh salah satu mahasiswa Universitas Negeri Jakarta sebagai bagian dari proyek ilmiah untuk mendukung program pencegahan stunting di Indonesia. Edukasi yang ditampilkan berdasarkan sumber ahli gizi di indonesia yang dapat memberikan pencerahan pentingnya orang tua di Indonesia mengrtahui pentingnya<strong> gizi seimbang</strong>, <strong>MPASI</strong>, <strong>imunisasi dasar</strong>, hingga pentingnya <strong>ASI eksklusif</strong>.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>🔍 Fitur Utama</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">📊 Kalkulator Gizi</div>
+        <div class="card-text">Cek status gizi anak berdasarkan umur, berat, dan tinggi badan.</div>
+        <div class="badge">Interaktif</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📚 Edukasi Gizi</div>
+        <div class="card-text">Artikel seputar nutrisi, MPASI, ASI, imunisasi dan lingkungan sehat.</div>
+        <div class="badge">Informasi</div>
+      </div>
+      <div class="card">
+        <div class="card-title">💬 Forum Diskusi</div>
+        <div class="card-text">Tempat berdiskusi dengan sesama orang tua mengenai tumbuh kembang anak.</div>
+        <div class="badge">Komunitas</div>
+      </div>
+      <div class="card">
+        <div class="card-title">👩‍⚕️ Konsultasi Ahli</div>
+        <div class="card-text">Tanya jawab langsung dengan dokter atau ahli gizi terpercaya.</div>
+        <div class="badge">Ahli</div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  
+
+  <script>
+    function showPage(page) {
+      document.getElementById('homePage').classList.add('hidden');
+      document.getElementById('edukasiPage').classList.add('hidden');
+
+      if (page === 'home') {
+        document.getElementById('homePage').classList.remove('hidden');
+      } else if (page === 'edukasi') {
+        document.getElementById('edukasiPage').classList.remove('hidden');
+      }
+    }
+
+    function hitungStatusGizi() {
+      const umur = parseInt(document.getElementById("umur").value);
+      const jk = document.getElementById("jenisKelamin").value;
+      const bb = parseFloat(document.getElementById("berat").value);
+      const tb = parseFloat(document.getElementById("tinggi").value);
+
+      if (isNaN(umur) || isNaN(bb) || isNaN(tb)) {
+        document.getElementById("hasil").innerHTML = "Mohon isi semua data dengan benar.";
+        return;
+      }
+
+      let statusTB_U = tb < 80 ? "Pendek" : tb < 85 ? "Normal" : "Tinggi";
+      let statusBB_U = bb < 8 ? "Berat Badan Kurang" : bb < 10 ? "Normal" : "Berat Badan Lebih";
+      let statusBB_TB = bb / (tb/100) ** 2 < 14 ? "Gizi Kurang" : bb / (tb/100) ** 2 < 18 ? "Normal" : "Gizi Lebih";
+
+      document.getElementById("hasil").innerHTML =
+        `<strong>Status TB/U:</strong> ${statusTB_U}<br>` +
+        `<strong>Status BB/U:</strong> ${statusBB_U}<br>` +
+        `<strong>Status BB/TB:</strong> ${statusBB_TB}<br><br>` +
+        `Rekomendasi: <em>Pastikan asupan gizi cukup dan rutin cek ke posyandu atau layanan kesehatan.</em>`;
+    }
+  </script>
+</body>
+</html>
+
+  <div class="section" id="tentang">
+    <h2>Edukasi Gizi dan Tumbuh Kembang</h2>
+    <div class="grid">
+      <div class="card"><div class="card-title">🌱 Apa Itu Stunting?</div><div class="card-text">Gagal tumbuh karena gizi buruk kronis terutama dalam 1000 hari pertama.</div><div class="badge">Stunting</div></div>
+      <div class="card"><div class="card-title">🥦 Gizi Seimbang untuk Anak</div><div class="card-text">Karbohidrat, protein, lemak sehat, vitamin & mineral wajib dipenuhi.</div><div class="badge">Nutrisi</div></div>
+      <div class="card"><div class="card-title">🍚 MPASI Usia 6 Bulan</div><div class="card-text">MPASI wajib diberikan di usia 6 bulan dengan gizi lengkap.</div><div class="badge">MPASI</div></div>
+      <div class="card"><div class="card-title">🧠 Stimulasi Tumbuh Kembang</div><div class="card-text">Bermain, membaca, bicara bantu perkembangan otak anak.</div><div class="badge">Stimulasi</div></div>
+      <div class="card"><div class="card-title">📅 Jadwal Imunisasi Dasar</div><div class="card-text">Imunisasi lengkap cegah penyakit penyebab stunting.</div><div class="badge">Imunisasi</div></div>
+      <div class="card"><div class="card-title">🍼 Pentingnya ASI Eksklusif</div><div class="card-text">ASI 6 bulan pertama wajib untuk pertumbuhan dan kekebalan.</div><div class="badge">ASI</div></div>
+      <div class="card"><div class="card-title">🧼 Cegah Stunting dari Lingkungan</div><div class="card-text">Sanitasi bersih, air layak, dan lingkungan sehat sangat penting.</div><div class="badge">Lingkungan</div></div>
+    </div>
+  </div>
+
+  <script>
+    // Navbar toggle
+    const hamburger = document.getElementById("hamburger");
+    const navLinks = document.getElementById("navLinks");
+    hamburger.addEventListener("click", () => {
+      navLinks.classList.toggle("active");
+    });
+
+  
+  </script>
+  
+   <h2>📊 Kalkulator Gizi Anak</h2>
+   <div class="section" id="formGizi">
+    <form onsubmit="event.preventDefault(); hitungStatusGizi();">
+      <label for="umur">Umur Anak (bulan)</label>
+      <input type="number" id="umur" placeholder="Contoh: 24" required />
+
+      <label for="jenisKelamin">Jenis Kelamin</label>
+      <select id="jenisKelamin" required>
+        <option value="">Pilih jenis kelamin</option>
+        <option value="L">Laki-laki</option>
+        <option value="P">Perempuan</option>
+      </select>
+
+      <label for="berat">Berat Badan (kg)</label>
+      <input type="number" step="0.1" id="berat" placeholder="Contoh: 12.5" required />
+
+      <label for="tinggi">Tinggi Badan (cm)</label>
+      <input type="number" step="0.1" id="tinggi" placeholder="Contoh: 85.0" required />
+
+      <button type="submit">🔍 Hitung Status Gizi</button>
+    </form>
+
+    <div id="hasil" class="hasil" style="display: none;"></div>
+  </div>
+
+  <script>
+    function hitungStatusGizi() {
+      const umur = parseInt(document.getElementById("umur").value);
+      const jk = document.getElementById("jenisKelamin").value;
+      const berat = parseFloat(document.getElementById("berat").value);
+      const tinggi = parseFloat(document.getElementById("tinggi").value);
+      const hasilEl = document.getElementById("hasil");
+
+      const imt = berat / ((tinggi / 100) ** 2);
+      let status = "";
+      let kelas = "";
+
+      // Logika sederhana IMT (bukan standar WHO resmi, hanya untuk demo)
+      if (imt < 14) {
+        status = "Gizi Kurang 😔";
+        kelas = "kurang";
+      } else if (imt >= 14 && imt <= 17) {
+        status = "Gizi Normal ✅";
+        kelas = "normal";
+      } else {
+        status = "Risiko Gizi Lebih ⚠️";
+        kelas = "lebih";
+      }
+
+      hasilEl.style.display = "block";
+      hasilEl.className = "hasil " + kelas;
+      hasilEl.textContent = `IMT Anak: ${imt.toFixed(2)} – ${status}`;
+    }
+  </script>
+  
+  
+  
+    <div class="section" id="Diskusi">
+  <title>Forum Diskusi - SiTumbuh</title>
+  <style>
+    :root {
+      --primary: #0d9488;
+      --background: #f8fafc;
+      --text-color: #1e293b;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-color);
+      padding: 1rem;
+    }
+
+    .section {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    form label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.3rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0f766e;
+    }
+
+    .forum-komentar {
+      margin-top: 2rem;
+    }
+
+    .komentar {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .komentar strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #0f172a;
+    }
+
+    @media (max-width: 600px) {
+      .section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="section" id="forum">
+    <h2>💬 Forum Diskusi Orang Tua</h2>
+
+    <form id="formDiskusi">
+      <label for="nama">Nama Anda</label>
+      <input type="text" id="nama" required />
+
+      <label for="pesan">Pesan / Pertanyaan</label>
+      <textarea id="pesan" rows="4" required></textarea>
+
+      <button type="submit">Kirim</button>
+    </form>
+
+    <div id="daftarDiskusi" class="forum-komentar">
+      <p>Belum ada diskusi. Jadilah yang pertama!</p>
+    </div>
+  </div>
+
+  <script>
+    const formDiskusi = document.getElementById("formDiskusi");
+    const daftarDiskusi = document.getElementById("daftarDiskusi");
+
+    let komentarList = [];
+
+    formDiskusi.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const nama = document.getElementById("nama").value.trim();
+      const pesan = document.getElementById("pesan").value.trim();
+
+      if (nama && pesan) {
+        const komentar = {
+          nama: nama,
+          pesan: pesan,
+          waktu: new Date().toLocaleString("id-ID")
+        };
+        komentarList.unshift(komentar); // Tambahkan ke awal
+        tampilkanKomentar();
+        formDiskusi.reset();
+      }
+    });
+
+    function tampilkanKomentar() {
+      daftarDiskusi.innerHTML = komentarList.length === 0
+        ? "<p>Belum ada diskusi. Jadilah yang pertama!</p>"
+        : komentarList.map(k => `
+          <div class="komentar">
+            <strong>${k.nama}</strong>
+            <small><em>${k.waktu}</em></small>
+            <p>${k.pesan}</p>
+          </div>
+        `).join("");
+    }
+  </script>
+</body>
+</html>
+  
+</body>
+</html>
